@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinanceGrow | Your income shifts, your finance too</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            mfi: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #064e3b; }
+    ::-webkit-scrollbar-thumb { background: #059669; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-slate-950">
+
+  <!-- ================= MAIN APP ================= -->
+  <div id="mainApp" class="min-h-screen flex flex-col md:flex-row">
+    <!-- Navigation Sidebar -->
+    <aside class="w-full md:w-64 bg-slate-900 border-b md:border-b-0 md:border-r border-emerald-950 flex flex-col justify-between p-5">
+      <div class="space-y-6">
+        <div class="flex items-center space-x-3 px-2">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center font-black text-slate-950 text-lg shadow-md">
+            <i class="fa-solid fa-seedling"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-base tracking-wide text-white leading-tight">FinanceGrow</h1>
+            <p class="text-[10px] text-emerald-400 italic font-medium leading-none">Income shifts, finance too</p>
+          </div>
+        </div>
+        <nav class="space-y-1.5" id="navContainer">
+          <button onclick="switchTab('home')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition bg-emerald-600 text-slate-950 font-bold shadow-md shadow-emerald-700/20" data-target="home">
+            <i class="fa-solid fa-chart-pie w-5"></i><span>Due & Overdue Monitor</span>
+          </button>
+          <button onclick="switchTab('loans')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-800" data-target="loans">
+            <i class="fa-solid fa-folder-open w-5"></i><span>All Loan Records</span>
+          </button>
+          <button onclick="switchTab('calculator')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-800" data-target="calculator">
+            <i class="fa-solid fa-calculator w-5"></i><span>Flexible Calculator</span>
+          </button>
+          <button onclick="switchTab('notifications')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-800" data-target="notifications">
+            <i class="fa-solid fa-bell w-5"></i><span>Notifications</span>
+          </button>
+          <button onclick="switchTab('personal')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-800" data-target="personal">
+            <i class="fa-solid fa-id-badge w-5"></i><span>Visiting Card & Bank</span>
+          </button>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Content Workspace -->
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto max-h-screen bg-slate-950">
+      
+      <!-- TAB 1: HOME (ONLY INCOMPLETE LOANS) -->
+      <section id="tab-home" class="tab-pane space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+              <span>Active Due & Overdue Collections</span>
+              <span class="text-xs font-semibold bg-emerald-950 border border-emerald-800 text-emerald-300 px-2.5 py-0.5 rounded-full uppercase">Only Incomplete Loans</span>
+            </h2>
+            <p class="text-sm text-slate-400">Track active borrowers, current dues, and overdue payments</p>
+          </div>
+          <div class="relative w-full sm:w-80">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-search"></i></span>
+            <input type="text" id="homeSearchInput" onkeyup="filterActiveApplicants()" placeholder="Search active borrower..." class="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:border-emerald-500 focus:outline-none text-slate-200" />
+          </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          <div class="bg-slate-900 border border-emerald-950 p-5 rounded-2xl relative overflow-hidden">
+            <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <span>Active Money Given</span>
+              <i class="fa-solid fa-coins text-emerald-400 text-lg"></i>
+            </div>
+            <div class="text-2xl font-extrabold text-white" id="statDisbursed">₹0</div>
+            <p class="text-[11px] text-emerald-500 mt-1">Excludes paid loans</p>
+          </div>
+          <div class="bg-slate-900 border border-emerald-950 p-5 rounded-2xl relative overflow-hidden">
+            <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <span>To Collect This Month</span>
+              <i class="fa-solid fa-calendar-check text-cyan-400 text-lg"></i>
+            </div>
+            <div class="text-2xl font-extrabold text-cyan-400" id="statTargetMonth">₹0</div>
+            <p class="text-[11px] text-slate-500 mt-1">Sum of current dues</p>
+          </div>
+          <div class="bg-slate-900 border border-emerald-950 p-5 rounded-2xl relative overflow-hidden">
+            <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <span>Collected This Month</span>
+              <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+            </div>
+            <div class="text-2xl font-extrabold text-emerald-400" id="statCollectedMonth">₹0</div>
+            <p class="text-[11px] text-slate-500 mt-1">Confirmed bank and cash receipts</p>
+          </div>
+          <div class="bg-slate-900 border border-emerald-950 p-5 rounded-2xl relative overflow-hidden">
+            <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <span>Total Overdue (Past Months)</span>
+              <i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg"></i>
+            </div>
+            <div class="text-2xl font-extrabold text-rose-400" id="statPastDue">₹0</div>
+            <p class="text-[11px] text-rose-400/80 mt-1">Requires follow-up</p>
+          </div>
+        </div>
+
+        <!-- Strict Incomplete Borrowers List -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+          <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/80">
+            <div>
+              <h3 class="font-bold text-base text-white">Borrowers with Pending Repayments</h3>
+              <p class="text-xs text-slate-400">Showing only people with outstanding balances (Closed loans excluded)</p>
+            </div>
+            <span class="text-xs text-emerald-400 font-semibold" id="activeLoansCountBadge">0 Active Accounts</span>
+          </div>
+          <div class="divide-y divide-slate-800 max-h-[500px] overflow-y-auto" id="activeListContainer"></div>
+        </div>
+      </section>
+
+      <!-- TAB 2: NOTIFICATIONS -->
+      <section id="tab-notifications" class="tab-pane hidden space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Activity & Real-Time Alerts</h2>
+          <p class="text-sm text-slate-400">Payment deposits, new loan requests, and complaint resolutions</p>
+        </div>
+
+        <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
+          <button onclick="switchNotifSubTab('tx')" id="notifBtn-tx" class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-slate-950 font-bold">Transaction History</button>
+          <button onclick="switchNotifSubTab('applicants')" id="notifBtn-applicants" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white">New Loan Applications</button>
+          <button onclick="switchNotifSubTab('complaints')" id="notifBtn-complaints" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white">Complaints & Help Requests</button>
+        </div>
+
+        <div id="notifPane-tx" class="space-y-3">
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold"><i class="fa-solid fa-arrow-down"></i></div>
+              <div>
+                <p class="text-sm font-semibold text-white">₹2,000 deposited by Ramesh Rao</p>
+                <p class="text-xs text-slate-500">Online UPI (Ref: UPI-489201928301) • Confirmed</p>
+              </div>
+            </div>
+            <span class="text-xs text-slate-400">10:45 AM, Today</span>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold"><i class="fa-solid fa-handshake"></i></div>
+              <div>
+                <p class="text-sm font-semibold text-white">₹3,500 collected in hand from Sunita Bai</p>
+                <p class="text-xs text-slate-500">Physical Cash Handover • Receipt Issued</p>
+              </div>
+            </div>
+            <span class="text-xs text-slate-400">03:12 PM, Yesterday</span>
+          </div>
+        </div>
+
+        <div id="notifPane-applicants" class="space-y-3 hidden">
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold"><i class="fa-solid fa-file-signature"></i></div>
+              <div>
+                <p class="text-sm font-semibold text-white">Pooja Sharma applied for a loan</p>
+                <p class="text-xs text-slate-500">Requested: ₹45,000 • Kirana Store Stocking</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-amber-500/10 text-amber-400">Under Review</span>
+          </div>
+        </div>
+
+        <div id="notifPane-complaints" class="space-y-3 hidden">
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-400">Resolved</span>
+                <p class="text-sm font-semibold text-white">Cash receipt update request by Ramesh</p>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Receipt verified with bank slip. Resolved in 24 hrs.</p>
+            </div>
+            <span class="text-xs text-slate-500">Sep 15, 2026</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: ALL LOAN RECORDS -->
+      <section id="tab-loans" class="tab-pane hidden space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white">All Loan Records</h2>
+            <p class="text-sm text-slate-400">Full history of all loans: land details, profession, ID proofs, and receipts</p>
+          </div>
+          <button onclick="openModal('newLoanModal')" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-sm flex items-center space-x-2 shadow-lg shadow-emerald-700/30">
+            <i class="fa-solid fa-plus-circle"></i><span>Issue New Loan</span>
+          </button>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+          <div class="p-4 border-b border-slate-800 bg-slate-900/60 flex flex-wrap gap-4 justify-between items-center">
+            <div class="text-xs text-slate-400">
+              Showing active and completed loans. Click <strong class="text-emerald-400">"View Full Details"</strong> to see all records, land surveys, thumbprints, and payment photos.
+            </div>
+            <input type="text" id="portfolioSearchInput" onkeyup="filterPortfolioApplicants()" placeholder="Search borrower..." class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500" />
+          </div>
+          <div class="divide-y divide-slate-800" id="loansTabListContainer"></div>
+        </div>
+      </section>
+
+      <!-- TAB 4: FLEXIBLE LOAN CALCULATOR -->
+      <section id="tab-calculator" class="tab-pane hidden space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Flexible Loan Calculator</h2>
+          <p class="text-sm text-slate-400">See how payments change with seasons across 6 to 36 months so the borrower never misses a payment</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-slate-900 border border-emerald-950 p-6 rounded-2xl space-y-4">
+            <h3 class="font-bold text-white text-base flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-emerald-400"></i><span>Loan Setup</span>
+            </h3>
+            <div>
+              <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Loan Amount in ₹</label>
+              <input type="number" id="calcPrincipal" value="60000" step="5000" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Yearly Interest Rate (%)</label>
+              <input type="number" id="calcRate" value="12" min="8" max="24" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Duration (Months: up to 36 Months)</label>
+              <select id="calcTenure" onchange="runCalculator()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <option value="6">6 Months</option>
+                <option value="12">12 Months (1 Year)</option>
+                <option value="18">18 Months (1.5 Years)</option>
+                <option value="24" selected>24 Months (2 Years)</option>
+                <option value="30">30 Months (2.5 Years)</option>
+                <option value="36">36 Months (3 Years)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Start Month</label>
+              <select id="calcStartMonth" onchange="runCalculator()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <option value="0">September 2026</option>
+                <option value="1">October 2026</option>
+                <option value="2">November 2026</option>
+                <option value="3">December 2026</option>
+                <option value="4">January 2027</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Borrower Earning Pattern</label>
+              <select id="calcProfile" onchange="runCalculator()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <option value="seasonal">Seasonal Farmer (Ravi) - High harvest, lean monsoon</option>
+                <option value="artisan">Festival Artisan - High festival boom, quiet off-season</option>
+                <option value="uniform">Daily Wage / Kirana - Steady earning every month</option>
+              </select>
+              <p id="archetypeExplanation" class="text-[11px] text-slate-400 mt-2 leading-relaxed bg-slate-800/40 p-2.5 rounded-lg border border-slate-700/50"></p>
+            </div>
+
+            <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-amber-400 flex items-center gap-1">
+                  <i class="fa-solid fa-bolt"></i><span>Simulate Bad Season / Crop Loss</span>
+                </span>
+                <input type="checkbox" id="calcApplyShock" onchange="runCalculator()" class="w-4 h-4 rounded text-emerald-600 focus:ring-0 bg-slate-900 border-slate-700 cursor-pointer" />
+              </div>
+              <p class="text-[10px] text-slate-400">Check this to see how the plan handles an unexpected flood or drought in Month 4.</p>
+            </div>
+
+            <button onclick="runCalculator()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-950 font-bold rounded-xl text-sm transition shadow-lg shadow-emerald-700/20">
+              Calculate Schedule
+            </button>
+          </div>
+
+          <div class="lg:col-span-2 bg-slate-900 border border-emerald-950 p-6 rounded-2xl flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base">Payment Comparison</h3>
+                <span class="text-xs text-emerald-400 font-mono font-bold" id="calcSummaryBadge">100% Full Repayment Guaranteed</span>
+              </div>
+              
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-4">
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+                  <span class="text-slate-500 uppercase text-[9px] font-bold">Loan Given:</span>
+                  <p class="text-sm font-bold text-white mt-0.5" id="calcStatPrincipal">₹0</p>
+                </div>
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+                  <span class="text-slate-500 uppercase text-[9px] font-bold">Total Interest:</span>
+                  <p class="text-sm font-bold text-cyan-400 mt-0.5" id="calcStatInterest">₹0</p>
+                </div>
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+                  <span class="text-slate-500 uppercase text-[9px] font-bold">Fixed Bank EMI:</span>
+                  <p class="text-sm font-bold text-rose-400 mt-0.5" id="calcStatEmi">₹0/mo</p>
+                </div>
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+                  <span class="text-slate-500 uppercase text-[9px] font-bold">Defaults Avoided:</span>
+                  <p class="text-sm font-bold text-emerald-400 mt-0.5" id="calcStatDefaults">0 Defaults</p>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto border border-slate-800 rounded-xl max-h-80 overflow-y-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                  <thead class="bg-slate-800 uppercase tracking-wider text-slate-400 text-[10px] sticky top-0">
+                    <tr>
+                      <th class="p-3">Month</th>
+                      <th class="p-3">Cash Surplus</th>
+                      <th class="p-3 text-rose-400">Static EMI</th>
+                      <th class="p-3 text-emerald-400">Dynamic Plan</th>
+                      <th class="p-3">Payment Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="calcTableBody" class="divide-y divide-slate-800"></tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Guardrail Box -->
+            <div class="p-4 rounded-xl bg-gradient-to-br from-emerald-950/60 via-slate-900 to-slate-900 border border-emerald-600/40 text-xs text-slate-300 space-y-2.5 shadow-xl">
+              <div class="flex items-center justify-between border-b border-emerald-800/50 pb-2">
+                <span class="text-emerald-300 font-bold uppercase tracking-wider text-xs flex items-center gap-2">
+                  <i class="fa-solid fa-shield-halved text-emerald-400 text-sm"></i>
+                  <span>Two Rules That Protect Both Borrower and Lender</span>
+                </span>
+                <span class="text-[10px] bg-emerald-900/60 text-emerald-200 border border-emerald-700/50 px-2 py-0.5 rounded font-mono">
+                  Zero Loss for Lender
+                </span>
+              </div>
+              
+              <div class="text-[11px] leading-relaxed space-y-1.5">
+                <p>
+                  • <strong>Rule 1 (Never Take More Than 40%):</strong> In bad months (like sowing or monsoon), payments drop so the borrower has enough money to eat and run their business[cite: 1].
+                </p>
+                <p>
+                  • <strong>Rule 2 (Full Repayment in Good Months):</strong> The remaining money is collected when earnings are high (harvest and festival time). The lender gets 100% of their principal and interest back[cite: 1].
+                </p>
+              </div>
+
+              <div class="p-2.5 bg-slate-950 border border-emerald-900/50 rounded-xl font-mono text-[11px] text-slate-300 flex flex-wrap justify-between items-center gap-2">
+                <span id="mathAuditVerdict" class="text-emerald-400 font-bold">RECOVERY STATUS: FULLY PAID</span>
+                <span class="text-slate-400 text-[10px]">
+                  Total Loan + Interest: <strong class="text-white" id="mathAuditTarget">₹0</strong> | 
+                  Total Collected by Flexible Plan: <strong class="text-emerald-300" id="mathAuditCollected">₹0</strong>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: VISITING CARD & BANKING -->
+      <section id="tab-personal" class="tab-pane hidden space-y-8">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Visiting Card & Bank Accounts</h2>
+          <p class="text-sm text-slate-400">Shareable contact card and official bank links for sending and receiving money</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Visiting Card -->
+          <div class="bg-gradient-to-tr from-slate-900 via-emerald-950 to-slate-900 border border-emerald-500/40 p-8 rounded-3xl relative shadow-2xl overflow-hidden flex flex-col justify-between h-64">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-2xl font-black text-white">V. Ganesh</h3>
+                <p class="text-sm text-emerald-400 font-semibold mt-0.5">Loan Manager</p>
+                <p class="text-xs text-slate-400 mt-1">FinanceGrow Micro Lending</p>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-xl text-emerald-400">
+                <i class="fa-solid fa-seedling"></i>
+              </div>
+            </div>
+            
+            <div class="space-y-1.5 text-xs text-slate-300">
+              <p><i class="fa-solid fa-phone text-emerald-400 w-5"></i> +91 98450 12345</p>
+              <p><i class="fa-solid fa-envelope text-emerald-400 w-5"></i> ganesh@financegrow.in</p>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 flex justify-between items-center">
+              <span class="text-[11px] text-emerald-400 italic">"Your income shifts, your finance too"</span>
+              <button onclick="shareVisitingCard()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-slate-950 flex items-center space-x-1.5 transition shadow-md shadow-emerald-700/30">
+                <i class="fa-solid fa-share-nodes"></i><span>Share Card</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Official Bank Accounts -->
+          <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+            <h3 class="font-bold text-white text-base">Official Lending Bank Accounts</h3>
+            <p class="text-xs text-slate-400">Bank accounts used to send loan amounts and receive repayments</p>
+
+            <div class="space-y-3">
+              <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/70 flex items-center justify-between">
+                <div>
+                  <p class="font-semibold text-sm text-white">State Bank of India (Primary Account)</p>
+                  <p class="text-xs font-mono text-slate-400">Account: XXXX-XXXX-4819</p>
+                  <p class="text-[11px] text-slate-500">IFSC: SBIN0001248 • Current Account</p>
+                </div>
+                <div class="flex space-x-2">
+                  <a href="https://www.onlinesbi.sbi" target="_blank" class="p-2 rounded-lg bg-slate-700 hover:bg-emerald-600 hover:text-slate-950 text-slate-200 text-xs flex items-center space-x-1 transition" title="Net Banking">
+                    <i class="fa-solid fa-globe"></i><span>Portal</span>
+                  </a>
+                  <a href="https://www.sbi.co.in/web/personal-banking/digital/yono" target="_blank" class="p-2 rounded-lg bg-slate-700 hover:bg-emerald-600 hover:text-slate-950 text-slate-200 text-xs flex items-center space-x-1 transition" title="Mobile App">
+                    <i class="fa-solid fa-mobile-screen"></i><span>YONO</span>
+                  </a>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/70 flex items-center justify-between">
+                <div>
+                  <p class="font-semibold text-sm text-white">Bank of India (BOI Account)</p>
+                  <p class="text-xs font-mono text-slate-400">Account: XXXX-XXXX-7140</p>
+                  <p class="text-[11px] text-slate-500">IFSC: BKID0008401 • Current Account</p>
+                </div>
+                <div class="flex space-x-2">
+                  <a href="https://www.bankofindia.co.in" target="_blank" class="p-2 rounded-lg bg-slate-700 hover:bg-emerald-600 hover:text-slate-950 text-slate-200 text-xs flex items-center space-x-1 transition">
+                    <i class="fa-solid fa-globe"></i><span>Portal</span>
+                  </a>
+                  <a href="https://www.bankofindia.co.in/digital-banking" target="_blank" class="p-2 rounded-lg bg-slate-700 hover:bg-emerald-600 hover:text-slate-950 text-slate-200 text-xs flex items-center space-x-1 transition">
+                    <i class="fa-solid fa-mobile-screen"></i><span>BOI Omni</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= FULL LOAN DETAILS MODAL ================= -->
+  <div id="applicantModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 hidden">
+    <div class="w-full max-w-5xl bg-slate-900 border border-emerald-900/60 rounded-3xl p-6 shadow-2xl space-y-6 max-h-[94vh] overflow-y-auto">
+      
+      <div class="flex justify-between items-start border-b border-slate-800 pb-4">
+        <div class="flex items-center space-x-4">
+          <div id="modalPhotoContainer" class="w-16 h-16 rounded-2xl bg-slate-800 border-2 border-emerald-500/40 overflow-hidden flex items-center justify-center shadow-lg"></div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h3 class="text-xl font-black text-white" id="modalApplicantName">Applicant Name</h3>
+              <span id="modalStatusBadge" class="text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase">Status</span>
+              <span class="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded font-mono" id="modalPslCategory">Category</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5" id="modalApplicantSub">Trade • Age • Marital Status • Phone</p>
+          </div>
+        </div>
+        <button onclick="closeModal('applicantModal')" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="p-3.5 bg-emerald-950/40 border border-emerald-800/50 rounded-2xl grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div>
+          <span class="text-slate-400 uppercase text-[9px] block font-bold">Loan Account Number</span>
+          <span class="font-mono text-emerald-300 font-bold text-sm" id="modalLanNumber">--</span>
+        </div>
+        <div>
+          <span class="text-slate-400 uppercase text-[9px] block font-bold">Loan Approval Number</span>
+          <span class="font-mono text-slate-200 font-bold text-sm" id="modalLsnNumber">--</span>
+        </div>
+        <div>
+          <span class="text-slate-400 uppercase text-[9px] block font-bold">Date & Time Given</span>
+          <span class="font-semibold text-white text-xs" id="modalSanctionTimestamp">--</span>
+        </div>
+        <div>
+          <span class="text-slate-400 uppercase text-[9px] block font-bold">Loan End Date</span>
+          <span class="text-amber-300 font-bold text-xs" id="modalMaturityDate">--</span>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-bold uppercase text-slate-400 mb-2 flex items-center gap-1.5">
+          <i class="fa-solid fa-calculator text-emerald-400"></i><span>Loan Amounts & Rates</span>
+        </h4>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs" id="modalGridDetails"></div>
+      </div>
+
+      <div class="p-4 bg-slate-800/40 rounded-2xl border border-slate-700/60 space-y-2">
+        <span class="text-emerald-400 font-bold uppercase text-[11px] flex items-center gap-2">
+          <i class="fa-solid fa-wheat-awn"></i><span>Land, Crops & Profession Details</span>
+        </span>
+        <div id="modalTradeProfileBox" class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs"></div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-700/60 space-y-1">
+          <span class="text-slate-500 font-bold uppercase text-[10px]">Nominee / Family Member</span>
+          <p id="modalNomineeText" class="text-slate-200 font-medium"></p>
+        </div>
+        <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-700/60 space-y-1">
+          <span class="text-slate-500 font-bold uppercase text-[10px]">Credit Bureau Record</span>
+          <p id="modalBureauText" class="text-slate-200 font-medium"></p>
+        </div>
+        <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-700/60 space-y-1">
+          <span class="text-slate-500 font-bold uppercase text-[10px]">Why Was Loan Taken?</span>
+          <p id="modalEndUseText" class="text-slate-200 font-medium"></p>
+        </div>
+      </div>
+
+      <!-- PROOFS & BIOMETRICS VAULT -->
+      <div class="p-4 bg-slate-800/40 rounded-2xl border border-slate-700/60 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-emerald-400 font-bold uppercase text-[11px] flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved"></i><span>ID Proof, Biometric & Payment Photos</span>
+          </span>
+          <span class="text-[10px] text-slate-400">Click any box to see the photo copy</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1">
+          <div onclick="viewProofAsset('ovd')" class="p-3 bg-slate-900 border border-slate-700/80 hover:border-emerald-500 rounded-xl cursor-pointer transition space-y-2 group">
+            <div class="flex justify-between items-center text-[10px] text-slate-400">
+              <span class="font-bold uppercase">1. ID Document Photo</span>
+              <i class="fa-solid fa-arrow-up-right-from-square group-hover:text-emerald-400"></i>
+            </div>
+            <div class="h-20 bg-slate-950 rounded-lg flex items-center justify-center overflow-hidden border border-slate-800" id="modalOvdThumbBox"></div>
+            <p class="text-[10px] text-slate-300 font-medium truncate" id="modalOvdLabelText">PAN/Voter/License</p>
+          </div>
+
+          <div onclick="viewProofAsset('thumb')" class="p-3 bg-slate-900 border border-slate-700/80 hover:border-emerald-500 rounded-xl cursor-pointer transition space-y-2 group">
+            <div class="flex justify-between items-center text-[10px] text-slate-400">
+              <span class="font-bold uppercase">2. Thumbprint Scan</span>
+              <i class="fa-solid fa-fingerprint text-emerald-400"></i>
+            </div>
+            <div class="h-20 bg-slate-950 rounded-lg flex flex-col items-center justify-center border border-slate-800 text-emerald-400">
+              <i class="fa-solid fa-fingerprint text-2xl"></i>
+              <span class="text-[9px] font-mono mt-1 text-slate-400">Matched 99%</span>
+            </div>
+            <p class="text-[10px] text-emerald-400 font-semibold truncate">Thumbprint Verified</p>
+          </div>
+
+          <div onclick="viewProofAsset('retina')" class="p-3 bg-slate-900 border border-slate-700/80 hover:border-emerald-500 rounded-xl cursor-pointer transition space-y-2 group">
+            <div class="flex justify-between items-center text-[10px] text-slate-400">
+              <span class="font-bold uppercase">3. Eye Retina Scan</span>
+              <i class="fa-solid fa-eye text-cyan-400"></i>
+            </div>
+            <div class="h-20 bg-slate-950 rounded-lg flex flex-col items-center justify-center border border-slate-800 text-cyan-400">
+              <i class="fa-solid fa-eye text-2xl"></i>
+              <span class="text-[9px] font-mono mt-1 text-slate-400" id="modalRetinaToken">Verified</span>
+            </div>
+            <p class="text-[10px] text-cyan-400 font-semibold truncate">Retina Token Verified</p>
+          </div>
+
+          <div onclick="viewProofAsset('disbursement')" class="p-3 bg-slate-900 border border-slate-700/80 hover:border-emerald-500 rounded-xl cursor-pointer transition space-y-2 group">
+            <div class="flex justify-between items-center text-[10px] text-slate-400">
+              <span class="font-bold uppercase">4. Money Given Photo</span>
+              <i class="fa-solid fa-receipt text-amber-400"></i>
+            </div>
+            <div class="h-20 bg-slate-950 rounded-lg flex flex-col items-center justify-center border border-slate-800 text-amber-400" id="modalHandoverThumbBox"></div>
+            <p class="text-[10px] text-amber-400 font-semibold truncate" id="modalHandoverLabel">Cash / Online / Cheque</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-700/60 space-y-1">
+          <span class="text-slate-500 font-bold uppercase text-[10px]">Living House Address</span>
+          <p id="modalAddressText" class="text-slate-200 leading-relaxed"></p>
+        </div>
+        <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-700/60 space-y-1">
+          <span class="text-slate-500 font-bold uppercase text-[10px]">Borrower Receiving Bank Account</span>
+          <p id="modalBankText" class="text-slate-200 font-mono"></p>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-bold uppercase text-slate-400 mb-2">Month-by-Month Repayment Record</h4>
+        <div class="max-h-48 overflow-y-auto border border-slate-800 rounded-xl" id="modalRepaymentTable"></div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="closeModal('applicantModal')" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold">
+          Close Window
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Proof Visualizer -->
+  <div id="dummyProofModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 hidden">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl space-y-4 relative">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="font-bold text-base text-white" id="proofModalTitle">Proof Verification</h3>
+          <p class="text-xs text-emerald-400">Official Stored Record</p>
+        </div>
+        <button onclick="closeModal('dummyProofModal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center relative overflow-hidden" id="proofCanvasArea"></div>
+
+      <div class="flex justify-between items-center text-xs text-slate-400 pt-2 border-t border-slate-800">
+        <span id="proofDocFingerprint" class="font-mono text-[10px]">RECORD ID: #89124</span>
+        <button onclick="closeModal('dummyProofModal')" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-semibold">
+          Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Issue New Loan -->
+  <div id="newLoanModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 hidden">
+    <div class="w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div class="flex justify-between items-start border-b border-slate-800 pb-4 mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white">Create New Loan</h3>
+          <p class="text-xs text-emerald-400 font-medium">FinanceGrow Flexible Lending Registration</p>
+        </div>
+        <button onclick="closeModal('newLoanModal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="newApplicantForm" onsubmit="handleNewApplicant(event)" class="space-y-5 text-xs">
+        <div>
+          <h4 class="text-slate-300 font-bold uppercase tracking-wider text-[11px] mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-user-check text-emerald-400"></i><span>1. Borrower Details</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-400 uppercase font-semibold mb-1">Full Legal Name *</label>
+              <input type="text" id="regName" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. Anand Kumar" />
+            </div>
+            <div>
+              <label class="block text-slate-400 uppercase font-semibold mb-1">Age *</label>
+              <input type="number" id="regAge" min="18" max="75" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500" placeholder="Min 18" />
+            </div>
+            <div>
+              <label class="block text-slate-400 uppercase font-semibold mb-1">Marital Status *</label>
+              <select id="regMarital" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                <option value="Married">Married</option>
+                <option value="Single">Single / Unmarried</option>
+                <option value="Widowed">Widowed</option>
+                <option value="Divorced / Separated">Divorced / Separated</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+            <div>
+              <label class="block text-slate-400 uppercase font-semibold mb-1">Occupation / Profession *</label>
+              <select id="regOccupation" onchange="renderDynamicProfessionFields()" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                <option value="Smallholder Farmer">Smallholder Farmer</option>
+                <option value="Handloom & Silk Weaver">Handloom & Silk Weaver</option>
+                <option value="Kirana / Grocery Store Owner">Kirana / Grocery Store Owner</option>
+                <option value="Auto / E-Rickshaw Driver">Auto / E-Rickshaw Driver</option>
+                <option value="Bangle & Imitation Jewelry Maker">Bangle & Imitation Jewelry Maker</option>
+                <option value="Mobile Repair & Recharge Kiosk">Mobile Repair & Recharge Kiosk</option>
+                <option value="Other">Other / Custom Enterprise</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 uppercase font-semibold mb-1">Loan Tenure Duration *</label>
+              <select id="regTenureMonths" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                <option value="6">6 Months</option>
+                <option value="12">12 Months (1 Year)</option>
+                <option value="18">18 Months (1.5 Years)</option>
+                <option value="24" selected>24 Months (2 Years)</option>
+                <option value="30">30 Months (2.5 Years)</option>
+                <option value="36">36 Months (3 Years)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 uppercase font-semibold mb-1">Mobile Contact (+91 locked) *</label>
+              <div class="flex">
+                <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-700 bg-slate-800 text-slate-400 font-mono text-xs">+91</span>
+                <input type="text" id="regPhone" required maxlength="10" placeholder="10-digit number" oninput="validateIndiaPhone(this)" class="w-full bg-slate-800 border border-slate-700 rounded-r-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-mono" />
+              </div>
+              <span id="phoneAlert" class="text-[10px] text-rose-400 hidden mt-1">Must be exactly 10 digits.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Profession Container -->
+        <div id="dynamicProfessionContainer" class="p-3.5 bg-slate-800/60 border border-emerald-500/40 rounded-2xl space-y-3"></div>
+
+        <!-- Address -->
+        <div class="p-3.5 bg-slate-800/50 border border-slate-700/80 rounded-2xl space-y-3">
+          <h4 class="text-slate-300 font-bold uppercase tracking-wider text-[11px] flex items-center gap-2">
+            <i class="fa-solid fa-house-user text-emerald-400"></i><span>2. Living House Address</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label class="block text-slate-400 mb-1">House No., Street & Locality *</label>
+              <input type="text" id="regAddressLine" required placeholder="e.g. Door No. 18, Ward 4" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">House Ownership *</label>
+              <select id="regResidenceType" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none">
+                <option value="Owned">Owned House</option>
+                <option value="Rented">Rented House</option>
+                <option value="Ancestral">Ancestral Family Home</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">City / Village *</label>
+              <input type="text" id="regCity" required placeholder="e.g. Udupi" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">State *</label>
+              <input type="text" id="regState" required value="Karnataka" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">PIN Code *</label>
+              <input type="text" id="regPincode" maxlength="6" required placeholder="6-digit PIN" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none font-mono" />
+            </div>
+          </div>
+        </div>
+
+        <!-- KYC & Biometrics -->
+        <div class="p-3.5 bg-slate-800/50 border border-slate-700/80 rounded-2xl space-y-3">
+          <h4 class="text-slate-300 font-bold uppercase tracking-wider text-[11px] flex items-center gap-2">
+            <i class="fa-solid fa-fingerprint text-emerald-400"></i><span>3. Biometrics, Photo & ID Document</span>
+          </h4>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Borrower Face Photo *</label>
+              <input type="file" id="regApplicantPhoto" accept="image/*" onchange="previewFile(this, 'photoPreview')" class="w-full text-slate-400 text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-slate-950 hover:file:bg-emerald-500" />
+              <div id="photoPreview" class="mt-2 w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 overflow-hidden hidden"></div>
+            </div>
+
+            <div>
+              <label class="block text-slate-400 mb-1">ID Document Type *</label>
+              <select id="regProofType" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-white focus:outline-none">
+                <option value="PAN Card">PAN Card</option>
+                <option value="Driving License">Driving License</option>
+                <option value="Voter Identity Card">Voter ID Card</option>
+                <option value="Passport">Passport</option>
+                <option value="NREGA Job Card">NREGA Job Card</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-400 mb-1">Document Number *</label>
+              <input type="text" id="regProofId" required placeholder="Card / ID Number" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none font-mono" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div>
+              <label class="block text-slate-400 mb-1">Upload Photo of ID Document *</label>
+              <input type="file" id="regDocPhoto" accept="image/*" onchange="previewFile(this, 'docPreview')" class="w-full text-slate-400 text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-emerald-600" />
+              <div id="docPreview" class="mt-2 w-28 h-16 rounded-xl bg-slate-900 border border-slate-700 overflow-hidden hidden"></div>
+            </div>
+
+            <div>
+              <label class="block text-slate-400 mb-1">Biometric Verification *</label>
+              <div class="flex space-x-2">
+                <button type="button" onclick="captureBiometric('Thumbprint')" class="flex-1 py-2 bg-slate-700 hover:bg-emerald-600 hover:text-slate-950 rounded-xl text-white font-medium flex items-center justify-center space-x-1.5 transition">
+                  <i class="fa-solid fa-fingerprint"></i><span>Capture Thumb</span>
+                </button>
+                <button type="button" onclick="captureBiometric('Retina')" class="flex-1 py-2 bg-slate-700 hover:bg-cyan-600 hover:text-slate-950 rounded-xl text-white font-medium flex items-center justify-center space-x-1.5 transition">
+                  <i class="fa-solid fa-eye"></i><span>Scan Retina</span>
+                </button>
+              </div>
+              <p id="biometricStatus" class="text-[10px] text-amber-400 mt-1 font-mono">Status: Awaiting biometric capture scan.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disbursement & Handover Photo -->
+        <div class="p-3.5 bg-slate-800/70 border border-emerald-500/30 rounded-2xl space-y-3">
+          <h4 class="text-slate-300 font-bold uppercase tracking-wider text-[11px] flex items-center gap-2">
+            <i class="fa-solid fa-money-bill-transfer text-emerald-400"></i><span>4. How is Money Given? & Photo Proof</span>
+          </h4>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 uppercase font-semibold mb-1">Payment Method *</label>
+              <select id="regDisburseMode" onchange="handleDisburseModeChange()" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                <option value="Hand">In Hand (Physical Cash)</option>
+                <option value="Online">Online Bank Transfer (UPI / IMPS / NEFT)</option>
+                <option value="Cheque">Bank Cheque</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 uppercase font-semibold mb-1">Transaction Ref / Receipt No</label>
+              <input type="text" id="regDisburseRef" placeholder="e.g. Receipt # or UPI Reference" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none" />
+            </div>
+          </div>
+
+          <div id="proofUploadSection" class="p-3 bg-slate-900 rounded-xl border border-slate-700 space-y-2">
+            <div id="proofHandBox">
+              <label class="block text-slate-300 font-semibold mb-1">Photo of Handing Cash to Borrower *</label>
+              <input type="file" id="regHandPhoto" accept="image/*" onchange="previewFile(this, 'handPhotoPreview')" class="w-full text-slate-400 text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-slate-950" />
+              <div id="handPhotoPreview" class="mt-2 w-36 h-20 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden hidden"></div>
+            </div>
+
+            <div id="proofOnlineBox" class="hidden">
+              <label class="block text-slate-300 font-semibold mb-1">Upload Online Bank Transfer Screenshot / Bill *</label>
+              <input type="file" id="regOnlineBill" accept="image/*" onchange="previewFile(this, 'onlineBillPreview')" class="w-full text-slate-400 text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-600 file:text-white" />
+              <div id="onlineBillPreview" class="mt-2 w-36 h-20 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden hidden"></div>
+            </div>
+
+            <div id="proofChequeBox" class="hidden space-y-3">
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1">1. Photo of Handing Cheque to Borrower *</label>
+                <input type="file" id="regChequeHandPhoto" accept="image/*" onchange="previewFile(this, 'chequeHandPreview')" class="w-full text-slate-400 text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white" />
+                <div id="chequeHandPreview" class="mt-2 w-36 h-20 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden hidden"></div>
+              </div>
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1">2. Clear Photo of Signed Cheque Leaf *</label>
+                <input type="file" id="regChequeLeafPhoto" accept="image/*" onchange="previewFile(this, 'chequeLeafPreview')" class="w-full text-slate-400 text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white" />
+                <div id="chequeLeafPreview" class="mt-2 w-36 h-20 rounded-xl bg-slate-800 border border-slate-700 overflow-hidden hidden"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+            <div>
+              <label class="block text-slate-400 mb-1">Borrower Bank Name *</label>
+              <input type="text" id="regBankName" required placeholder="e.g. Canara Bank, SBI" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Account Number *</label>
+              <input type="text" id="regAccountNo" required placeholder="Account number" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none font-mono" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">IFSC Code (11 Chars) *</label>
+              <input type="text" id="regIfsc" maxlength="11" required placeholder="e.g. CNRB0001248" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none uppercase font-mono" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Household Income & Loan Request -->
+        <div class="p-3.5 bg-slate-800/70 border border-slate-700 rounded-2xl space-y-3">
+          <p class="text-[11px] font-bold text-emerald-400 uppercase tracking-wide">5. Income & Loan Verification</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Total Family Yearly Income (Max ₹3L) *</label>
+              <input type="number" id="regHhIncome" max="300000" required placeholder="₹ ≤ 3,00,000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Existing Monthly Loan Payments (₹) *</label>
+              <input type="number" id="regDebtOutflow" required placeholder="Existing EMIs" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Loan Amount Requested (₹) *</label>
+              <input type="number" id="regLoanAmount" required placeholder="Loan amount" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" onclick="closeModal('newLoanModal')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl shadow-lg shadow-emerald-700/30">
+            Issue Loan & Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    let biometricToken = null;
+    let currentSelectedApplicant = null;
+
+    let applicants = [
+      {
+        id: "FG-01",
+        lan: "LAN-KA-2026-00812",
+        lsn: "LSN-2026-KA-0941",
+        name: "Ramesh Rao",
+        age: 42,
+        maritalStatus: "Married",
+        occupation: "Smallholder Farmer",
+        phone: "+91 9481230491",
+        address: "Sy. No. 42, Anekal Road, Jigani Hobli, Bengaluru Rural - 560105 (Owned House)",
+        bankDetails: "State Bank of India • A/C: 389201948201 • IFSC: SBIN0001248",
+        idType: "PAN Card",
+        idNumber: "ABCDE1234F",
+        biometricVerified: true,
+        photoUrl: null,
+        ovdPhotoUrl: null,
+        disburseMode: "Online",
+        disburseRef: "UPI-489201928301",
+        disburseProofText: "Online Bank NEFT Transfer Receipt Verified (Ref: UPI-489201928301)",
+        disburseProofImg: null,
+        sanctionDateTime: "12 May 2026 at 11:30:15 AM IST",
+        maturityDate: "12 May 2028",
+        duration: "24 Months",
+        pslCategory: "Agriculture - Small Farmer",
+        nomineeDetails: "Kavitha Rao (Wife, 38 yrs)",
+        bureauDetails: "CIBIL: 680 • Clean Record",
+        endUseDetails: "Installation of 2-acre drip irrigation pipeline and seeds",
+        tradeProfile: {
+          landLocation: "Survey No. 42, Jigani Village, Anekal Taluk",
+          cultivatedArea: "3.5 Acres",
+          cropType: "Chilli, Tomato & Groundnut",
+          landTenancy: "Self-Owned Patta Land",
+          secondaryIncome: "₹8,000/mo from Dairy (2 Gir Cows milk sale)"
+        },
+        hhIncome: 180000,
+        sanctionedAmount: 60000,
+        interestRateApr: 12.0,
+        tenure: 24,
+        processingFee: 900,
+        prepaymentPenalty: "0.00% (Free)",
+        cibilScore: 680,
+        totalPayable: 74400,
+        paidTillNow: 24000,
+        status: "Active",
+        monthTarget: 3100,
+        collectedThisMonth: 2000,
+        overduePast: 3500,
+        repaymentType: "Dynamic Flexible",
+        schedule: [
+          { month: "September 2026", target: 2000, paid: 2000, status: "Cleared" },
+          { month: "October 2026 (Monsoon Dip)", target: 1200, paid: 1200, status: "Cleared" },
+          { month: "November 2026", target: 3500, paid: 0, status: "Overdue" },
+          { month: "December 2026", target: 3100, paid: 2000, status: "Partial" },
+          { month: "January 2027", target: 4500, paid: 0, status: "Scheduled" }
+        ]
+      },
+      {
+        id: "FG-02",
+        lan: "LAN-KA-2026-00813",
+        lsn: "LSN-2026-KA-0942",
+        name: "Sunita Bai",
+        age: 38,
+        maritalStatus: "Married",
+        occupation: "Handloom & Silk Weaver",
+        phone: "+91 9845110294",
+        address: "Door 14/B, Weavers Colony, Ilkal, Bagalkot - 587125 (Owned House)",
+        bankDetails: "Canara Bank • A/C: 082910100481 • IFSC: CNRB0000829",
+        idType: "Driving License",
+        idNumber: "KA-20200019281",
+        biometricVerified: true,
+        photoUrl: null,
+        ovdPhotoUrl: null,
+        disburseMode: "Hand",
+        disburseRef: "CASH-REC-1042",
+        disburseProofText: "Physical Handover Photo Signed & Verified by Field Officer",
+        disburseProofImg: null,
+        sanctionDateTime: "04 July 2026 at 02:45:10 PM IST",
+        maturityDate: "04 May 2028",
+        duration: "24 Months",
+        pslCategory: "Micro Enterprise - Textile",
+        nomineeDetails: "Gopal Bai (Husband, 42 yrs)",
+        bureauDetails: "CRIF High Mark: 715 • Always on-time",
+        endUseDetails: "Raw mulberry silk yarn purchase",
+        tradeProfile: {
+          landLocation: "Weavers Shed, Ilkal Industrial Layout",
+          cultivatedArea: "2 Working Handlooms",
+          cropType: "Traditional Ilkal Silk Sarees",
+          landTenancy: "Rented Workspace (₹1,500/mo)",
+          secondaryIncome: "Embroidery work for boutiques"
+        },
+        hhIncome: 240000,
+        sanctionedAmount: 40000,
+        interestRateApr: 12.5,
+        tenure: 24,
+        processingFee: 600,
+        prepaymentPenalty: "0.00% (Free)",
+        cibilScore: 715,
+        totalPayable: 50000,
+        paidTillNow: 16000,
+        status: "Active",
+        monthTarget: 2100,
+        collectedThisMonth: 2100,
+        overduePast: 900,
+        repaymentType: "Dynamic Flexible",
+        schedule: [
+          { month: "September 2026", target: 2100, paid: 2100, status: "Cleared" },
+          { month: "October 2026", target: 2100, paid: 2100, status: "Cleared" },
+          { month: "November 2026", target: 2100, paid: 1500, status: "Partial" }
+        ]
+      },
+      {
+        id: "FG-03",
+        lan: "LAN-KA-2026-00814",
+        lsn: "LSN-2026-KA-0943",
+        name: "M. Ghouse",
+        age: 34,
+        maritalStatus: "Married",
+        occupation: "Auto / E-Rickshaw Driver",
+        phone: "+91 9900821034",
+        address: "Quarter 22, Bilal Nagar, Shivamogga - 577201 (Rented House)",
+        bankDetails: "Bank of India • A/C: 520101002910 • IFSC: BKID0005201",
+        idType: "Driving License",
+        idNumber: "KA-14201800291",
+        biometricVerified: true,
+        photoUrl: null,
+        ovdPhotoUrl: null,
+        disburseMode: "Cheque",
+        disburseRef: "CHQ-890218",
+        disburseProofText: "Cheque Handover Photo & Signed Cheque Leaf #890218 Verified",
+        disburseProofImg: null,
+        sanctionDateTime: "18 August 2026 at 04:10:22 PM IST",
+        maturityDate: "18 August 2029",
+        duration: "36 Months",
+        pslCategory: "Small Transport Driver",
+        nomineeDetails: "Zainab Bi (Wife, 30 yrs)",
+        bureauDetails: "CIBIL: 695 • Good Track Record",
+        endUseDetails: "Battery pack purchase for e-rickshaw",
+        tradeProfile: {
+          landLocation: "Vehicle Reg: KA-14-EA-4821",
+          cultivatedArea: "Route: Shivamogga Railway Station to Bus Stand",
+          cropType: "Passenger Transport",
+          landTenancy: "Self-Owned Vehicle with Permit",
+          secondaryIncome: "Weekend delivery transport"
+        },
+        hhIncome: 210000,
+        sanctionedAmount: 35000,
+        interestRateApr: 11.8,
+        tenure: 36,
+        processingFee: 525,
+        prepaymentPenalty: "0.00% (Free)",
+        cibilScore: 695,
+        totalPayable: 47390,
+        paidTillNow: 14000,
+        status: "Active",
+        monthTarget: 1320,
+        collectedThisMonth: 1320,
+        overduePast: 0,
+        repaymentType: "Dynamic Flexible",
+        schedule: [
+          { month: "September 2026", target: 1320, paid: 1320, status: "Cleared" },
+          { month: "October 2026", target: 1320, paid: 1320, status: "Cleared" },
+          { month: "November 2026", target: 1320, paid: 0, status: "Scheduled" }
+        ]
+      },
+      {
+        id: "FG-04",
+        lan: "LAN-KA-2026-00810",
+        lsn: "LSN-2026-KA-0940",
+        name: "Laxmi Devi",
+        age: 45,
+        maritalStatus: "Widowed",
+        occupation: "Bangle & Imitation Jewelry Maker",
+        phone: "+91 9740112934",
+        address: "House No 5, Potter Street, Belagavi - 590001 (Owned House)",
+        bankDetails: "Bank of India • A/C: 190250010091 • IFSC: BKID0001902",
+        idType: "Voter Identity Card",
+        idNumber: "VTR8920194",
+        biometricVerified: true,
+        photoUrl: null,
+        ovdPhotoUrl: null,
+        disburseMode: "Hand",
+        disburseRef: "CASH-REC-0912",
+        disburseProofText: "In-Hand Physical Cash Handover Photo Archival Completed",
+        disburseProofImg: null,
+        sanctionDateTime: "10 January 2026 at 10:15:00 AM IST",
+        maturityDate: "10 July 2026",
+        duration: "6 Months",
+        pslCategory: "Women Owned Micro Enterprise",
+        nomineeDetails: "Praveen Kumar (Son, 22 yrs)",
+        bureauDetails: "CIBIL: 720 • Zero Overdues",
+        endUseDetails: "Brass wire and stones for festival market stall",
+        tradeProfile: {
+          landLocation: "Market Stall, Belagavi Weekly Bazaar",
+          cultivatedArea: "Portable Wooden Stall",
+          cropType: "Traditional Bangles & Beads",
+          landTenancy: "Vendor Municipal Permit",
+          secondaryIncome: "Tailoring alterations in evening"
+        },
+        hhIncome: 140000,
+        sanctionedAmount: 20000,
+        interestRateApr: 11.5,
+        tenure: 6,
+        processingFee: 300,
+        prepaymentPenalty: "0.00% (Free)",
+        cibilScore: 720,
+        totalPayable: 21500,
+        paidTillNow: 21500,
+        status: "Fully Paid",
+        monthTarget: 0,
+        collectedThisMonth: 0,
+        overduePast: 0,
+        repaymentType: "Standard",
+        schedule: [
+          { month: "Feb - July 2026", target: 21500, paid: 21500, status: "Closed" }
+        ]
+      }
+    ];
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-pane").forEach(el => el.classList.add("hidden"));
+      document.getElementById("tab-" + tabId).classList.remove("hidden");
+
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        if (btn.getAttribute("data-target") === tabId) {
+          btn.className = "nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition bg-emerald-600 text-slate-950 font-bold shadow-md shadow-emerald-700/20";
+        } else {
+          btn.className = "nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-800";
+        }
+      });
+      if (tabId === 'calculator') runCalculator();
+    }
+
+    function switchNotifSubTab(sub) {
+      ['tx', 'applicants', 'complaints'].forEach(s => {
+        document.getElementById(`notifPane-${s}`).classList.add("hidden");
+        document.getElementById(`notifBtn-${s}`).className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white";
+      });
+      document.getElementById(`notifPane-${sub}`).classList.remove("hidden");
+      document.getElementById(`notifBtn-${sub}`).className = "px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-slate-950 font-bold";
+    }
+
+    function refreshAllViews() {
+      const activeLoans = applicants.filter(a => a.status === "Active");
+      const totalDisbursedActive = activeLoans.reduce((sum, a) => sum + a.sanctionedAmount, 0);
+      const totalThisMonthTarget = activeLoans.reduce((sum, a) => sum + a.monthTarget, 0);
+      const totalThisMonthCollected = activeLoans.reduce((sum, a) => sum + a.collectedThisMonth, 0);
+      const totalPastOverdue = activeLoans.reduce((sum, a) => sum + a.overduePast, 0);
+
+      document.getElementById("statDisbursed").innerText = "₹" + totalDisbursedActive.toLocaleString('en-IN');
+      document.getElementById("statTargetMonth").innerText = "₹" + totalThisMonthTarget.toLocaleString('en-IN');
+      document.getElementById("statCollectedMonth").innerText = "₹" + totalThisMonthCollected.toLocaleString('en-IN');
+      document.getElementById("statPastDue").innerText = "₹" + totalPastOverdue.toLocaleString('en-IN');
+
+      renderHomeActiveOnly(activeLoans);
+      renderLoansRegistry(applicants);
+    }
+
+    function renderHomeActiveOnly(activeList) {
+      const container = document.getElementById("activeListContainer");
+      container.innerHTML = "";
+      document.getElementById("activeLoansCountBadge").innerText = `${activeList.length} Active Accounts`;
+
+      if (activeList.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-500 text-sm">All loan accounts are settled or no active dues match filter.</div>`;
+        return;
+      }
+
+      activeList.forEach(a => {
+        const div = document.createElement("div");
+        div.className = "p-4 hover:bg-slate-800/60 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4";
+        div.innerHTML = `
+          <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-bold text-emerald-400 text-sm overflow-hidden">
+              ${a.photoUrl ? `<img src="${a.photoUrl}" class="w-full h-full object-cover" />` : a.name.charAt(0)}
+            </div>
+            <div>
+              <p class="text-sm font-bold text-white flex items-center gap-2">
+                ${a.name}
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-300 font-semibold">Active Due</span>
+                <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">${a.disburseMode}</span>
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5">${a.occupation} • ${a.phone}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-6 text-xs text-right">
+            <div>
+              <span class="text-slate-500 uppercase text-[9px] block">This Month Due</span>
+              <span class="font-bold text-cyan-400 text-sm">₹${a.monthTarget.toLocaleString('en-IN')}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 uppercase text-[9px] block">Deposited</span>
+              <span class="font-bold ${a.collectedThisMonth >= a.monthTarget ? 'text-emerald-400' : 'text-amber-400'} text-sm">₹${a.collectedThisMonth.toLocaleString('en-IN')}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 uppercase text-[9px] block">Overdue Arrears</span>
+              <span class="font-bold ${a.overduePast > 0 ? 'text-rose-400' : 'text-slate-400'} text-sm">₹${a.overduePast.toLocaleString('en-IN')}</span>
+            </div>
+            <button onclick="openApplicantModal('${a.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-slate-200 text-xs rounded-xl font-bold transition">
+              View Details
+            </button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderLoansRegistry(data) {
+      const container = document.getElementById("loansTabListContainer");
+      container.innerHTML = "";
+      data.forEach(a => {
+        const div = document.createElement("div");
+        div.className = "p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-850 border-b border-slate-800/80";
+        div.innerHTML = `
+          <div class="space-y-1.5">
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-base text-white">${a.name}</span>
+              <span class="text-xs text-slate-400 font-mono">(${a.lan})</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full ${a.status === 'Active' ? 'bg-emerald-950 border border-emerald-800 text-emerald-300' : 'bg-slate-800 text-slate-400'} font-bold">${a.status}</span>
+              <span class="text-[10px] bg-slate-800 text-emerald-400 px-2 py-0.5 rounded font-mono">Score: ${a.cibilScore}</span>
+            </div>
+            <p class="text-xs text-slate-300">
+              <strong class="text-slate-400">Trade:</strong> ${a.occupation} | 
+              <strong class="text-slate-400">Category:</strong> ${a.pslCategory} | 
+              <strong class="text-slate-400">Channel:</strong> ${a.disburseMode} (${a.disburseRef})
+            </p>
+            <p class="text-xs text-slate-400"><strong class="text-slate-500">Living House:</strong> ${a.address}</p>
+            <div class="flex flex-wrap gap-4 text-[11px] text-slate-400 pt-1">
+              <span><strong>Principal:</strong> ₹${a.sanctionedAmount.toLocaleString('en-IN')}</span>
+              <span><strong>Total Payable:</strong> ₹${a.totalPayable.toLocaleString('en-IN')}</span>
+              <span><strong>Duration:</strong> ${a.duration}</span>
+              <span><strong>Date Given:</strong> ${a.sanctionDateTime}</span>
+            </div>
+          </div>
+          <div class="flex md:flex-col items-end justify-between md:justify-center gap-2">
+            <span class="text-xs font-semibold text-emerald-400">Collected: ₹${a.paidTillNow.toLocaleString('en-IN')} / ₹${a.totalPayable.toLocaleString('en-IN')}</span>
+            <button onclick="openApplicantModal('${a.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs rounded-xl font-bold transition flex items-center space-x-1.5 shadow-md shadow-emerald-700/20">
+              <i class="fa-solid fa-folder-open"></i><span>View Full Details</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function filterActiveApplicants() {
+      const q = document.getElementById("homeSearchInput").value.toLowerCase();
+      const activeOnly = applicants.filter(a => a.status === "Active" && a.name.toLowerCase().includes(q));
+      renderHomeActiveOnly(activeOnly);
+    }
+
+    function filterPortfolioApplicants() {
+      const q = document.getElementById("portfolioSearchInput").value.toLowerCase();
+      const filtered = applicants.filter(a => a.name.toLowerCase().includes(q) || a.lsn.toLowerCase().includes(q) || a.lan.toLowerCase().includes(q));
+      renderLoansRegistry(filtered);
+    }
+
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove("hidden");
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add("hidden");
+    }
+
+    function openApplicantModal(appId) {
+      const a = applicants.find(x => x.id === appId);
+      if (!a) return;
+      currentSelectedApplicant = a;
+
+      document.getElementById("modalApplicantName").innerText = a.name;
+      document.getElementById("modalApplicantSub").innerText = `${a.id} • ${a.occupation} (${a.age} yrs, ${a.maritalStatus}) • Contact: ${a.phone}`;
+      document.getElementById("modalPslCategory").innerText = a.pslCategory;
+
+      const statusBadge = document.getElementById("modalStatusBadge");
+      statusBadge.innerText = a.status;
+      statusBadge.className = a.status === "Active" ? "text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase bg-emerald-950 border border-emerald-800 text-emerald-300" : "text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase bg-slate-800 text-slate-400";
+
+      const photoContainer = document.getElementById("modalPhotoContainer");
+      if (a.photoUrl) {
+        photoContainer.innerHTML = `<img src="${a.photoUrl}" class="w-full h-full object-cover" />`;
+      } else {
+        photoContainer.innerHTML = `<i class="fa-solid fa-user text-emerald-400 text-2xl"></i>`;
+      }
+
+      document.getElementById("modalLanNumber").innerText = a.lan;
+      document.getElementById("modalLsnNumber").innerText = a.lsn;
+      document.getElementById("modalSanctionTimestamp").innerText = a.sanctionDateTime;
+      document.getElementById("modalMaturityDate").innerText = a.maturityDate;
+
+      const tradeBox = document.getElementById("modalTradeProfileBox");
+      if (a.tradeProfile) {
+        tradeBox.innerHTML = `
+          <div class="p-2.5 bg-slate-900 rounded-xl border border-slate-800"><span class="text-slate-500 font-bold uppercase text-[9px]">Location / Survey No:</span> <p class="text-white mt-0.5 font-medium">${a.tradeProfile.landLocation}</p></div>
+          <div class="p-2.5 bg-slate-900 rounded-xl border border-slate-800"><span class="text-slate-500 font-bold uppercase text-[9px]">Area / Capacity:</span> <p class="text-emerald-400 mt-0.5 font-bold">${a.tradeProfile.cultivatedArea}</p></div>
+          <div class="p-2.5 bg-slate-900 rounded-xl border border-slate-800"><span class="text-slate-500 font-bold uppercase text-[9px]">Crops / Trade Items:</span> <p class="text-white mt-0.5 font-medium">${a.tradeProfile.cropType}</p></div>
+          <div class="p-2.5 bg-slate-900 rounded-xl border border-slate-800"><span class="text-slate-500 font-bold uppercase text-[9px]">Ownership Status:</span> <p class="text-cyan-400 mt-0.5 font-bold">${a.tradeProfile.landTenancy}</p></div>
+          <div class="p-2.5 bg-slate-900 rounded-xl border border-slate-800 sm:col-span-2"><span class="text-slate-500 font-bold uppercase text-[9px]">Secondary Extra Income:</span> <p class="text-amber-300 mt-0.5 font-medium">${a.tradeProfile.secondaryIncome}</p></div>
+        `;
+      } else {
+        tradeBox.innerHTML = `<p class="text-slate-500">Standard trade profile registered.</p>`;
+      }
+
+      document.getElementById("modalNomineeText").innerText = a.nomineeDetails;
+      document.getElementById("modalBureauText").innerText = a.bureauDetails;
+      document.getElementById("modalEndUseText").innerText = a.endUseDetails;
+
+      const ovdBox = document.getElementById("modalOvdThumbBox");
+      if (a.ovdPhotoUrl) {
+        ovdBox.innerHTML = `<img src="${a.ovdPhotoUrl}" class="w-full h-full object-cover" />`;
+      } else {
+        ovdBox.innerHTML = `<i class="fa-solid fa-id-card text-emerald-400 text-xl"></i>`;
+      }
+      document.getElementById("modalOvdLabelText").innerText = `${a.idType}: ${a.idNumber}`;
+
+      const handoverBox = document.getElementById("modalHandoverThumbBox");
+      if (a.disburseProofImg) {
+        handoverBox.innerHTML = `<img src="${a.disburseProofImg}" class="w-full h-full object-cover" />`;
+      } else {
+        handoverBox.innerHTML = `<i class="fa-solid fa-receipt text-amber-400 text-xl"></i>`;
+      }
+      document.getElementById("modalHandoverLabel").innerText = `${a.disburseMode}: ${a.disburseRef}`;
+
+      document.getElementById("modalAddressText").innerText = a.address;
+      document.getElementById("modalBankText").innerText = a.bankDetails;
+
+      const netDisbursed = a.sanctionedAmount - a.processingFee;
+      const grid = document.getElementById("modalGridDetails");
+      grid.innerHTML = `
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60"><span class="text-slate-500 uppercase text-[9px] font-bold">Total Loan Given:</span> <p class="font-bold text-emerald-400 text-sm mt-0.5">₹${a.sanctionedAmount.toLocaleString('en-IN')}</p></div>
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60"><span class="text-slate-500 uppercase text-[9px] font-bold">Yearly Rate:</span> <p class="font-bold text-cyan-400 text-sm mt-0.5">${a.interestRateApr}% p.a.</p></div>
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60"><span class="text-slate-500 uppercase text-[9px] font-bold">Total Interest:</span> <p class="font-bold text-white text-sm mt-0.5">₹${(a.totalPayable - a.sanctionedAmount).toLocaleString('en-IN')}</p></div>
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60"><span class="text-slate-500 uppercase text-[9px] font-bold">Total Amount to Pay:</span> <p class="font-bold text-emerald-300 text-sm mt-0.5">₹${a.totalPayable.toLocaleString('en-IN')}</p></div>
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60"><span class="text-slate-500 uppercase text-[9px] font-bold">Processing Fee (1.5%):</span> <p class="font-semibold text-slate-200 mt-0.5">₹${a.processingFee}</p></div>
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60"><span class="text-slate-500 uppercase text-[9px] font-bold">Cash in Hand Given:</span> <p class="font-bold text-cyan-300 mt-0.5">₹${netDisbursed.toLocaleString('en-IN')}</p></div>
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60"><span class="text-slate-500 uppercase text-[9px] font-bold">Family Yearly Income:</span> <p class="font-semibold text-slate-200 mt-0.5">₹${a.hhIncome.toLocaleString('en-IN')}/yr</p></div>
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60"><span class="text-slate-500 uppercase text-[9px] font-bold">Loan Duration:</span> <p class="font-semibold text-emerald-400 mt-0.5">${a.duration}</p></div>
+      `;
+
+      const tBody = document.getElementById("modalRepaymentTable");
+      let rows = a.schedule.map(s => `
+        <div class="flex justify-between items-center p-3 text-xs border-b border-slate-800/60">
+          <span class="font-medium text-slate-200">${s.month}</span>
+          <span class="text-slate-400">Target: ₹${s.target.toLocaleString('en-IN')}</span>
+          <span class="font-semibold ${s.paid >= s.target ? 'text-emerald-400' : (s.paid > 0 ? 'text-amber-400' : 'text-slate-400')}">Paid: ₹${s.paid.toLocaleString('en-IN')}</span>
+          <span class="px-2 py-0.5 rounded text-[10px] ${s.status === 'Cleared' || s.status === 'Closed' ? 'bg-emerald-500/20 text-emerald-400' : (s.status === 'Overdue' ? 'bg-rose-500/20 text-rose-400' : 'bg-slate-800 text-slate-400')}">${s.status}</span>
+        </div>
+      `).join('');
+      tBody.innerHTML = rows;
+
+      openModal("applicantModal");
+    }
+
+    function viewProofAsset(assetType) {
+      if (!currentSelectedApplicant) return;
+      const a = currentSelectedApplicant;
+      const titleEl = document.getElementById("proofModalTitle");
+      const canvasEl = document.getElementById("proofCanvasArea");
+      const fpEl = document.getElementById("proofDocFingerprint");
+
+      fpEl.innerText = `RECORD ID: #${Math.floor(10000 + Math.random()*90000)}`;
+
+      if (assetType === 'ovd') {
+        titleEl.innerText = `Identity Document: ${a.idType}`;
+        if (a.ovdPhotoUrl) {
+          canvasEl.innerHTML = `<img src="${a.ovdPhotoUrl}" class="max-h-72 mx-auto rounded-xl border border-slate-700 shadow-lg" />`;
+        } else {
+          canvasEl.innerHTML = `
+            <div class="p-6 bg-slate-900 border-2 border-emerald-500/40 rounded-2xl text-left space-y-3">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider"><i class="fa-solid fa-address-card mr-1"></i> ${a.idType}</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-mono">VERIFIED</span>
+              </div>
+              <div class="h-32 bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 space-y-2">
+                <p class="text-slate-400">NAME: <strong class="text-white">${a.name}</strong></p>
+                <p class="text-slate-400">DOCUMENT NO: <strong class="text-emerald-400">${a.idNumber}</strong></p>
+                <p class="text-slate-400">ADDRESS: ${a.address.split(',')[0]}</p>
+              </div>
+            </div>
+          `;
+        }
+      } else if (assetType === 'thumb') {
+        titleEl.innerText = `Thumbprint Scan: ${a.name}`;
+        canvasEl.innerHTML = `
+          <div class="p-6 bg-slate-900 border-2 border-emerald-500/40 rounded-2xl text-center space-y-3">
+            <div class="w-24 h-24 mx-auto rounded-2xl bg-slate-950 border-2 border-emerald-500/60 flex items-center justify-center text-emerald-400 text-5xl shadow-lg">
+              <i class="fa-solid fa-fingerprint"></i>
+            </div>
+            <div class="font-mono text-xs text-slate-300 space-y-1">
+              <p class="text-emerald-400 font-bold">BIOMETRIC MATCH: 99.4%</p>
+              <p class="text-slate-500">Timestamp: ${a.sanctionDateTime}</p>
+            </div>
+            <span class="inline-block text-[10px] bg-emerald-950 border border-emerald-800 text-emerald-300 px-3 py-1 rounded-full font-bold">
+              ✓ Legal Sign-off Verified
+            </span>
+          </div>
+        `;
+      } else if (assetType === 'retina') {
+        titleEl.innerText = `Eye Retina Scan: ${a.name}`;
+        canvasEl.innerHTML = `
+          <div class="p-6 bg-slate-900 border-2 border-cyan-500/40 rounded-2xl text-center space-y-3">
+            <div class="w-24 h-24 mx-auto rounded-2xl bg-slate-950 border-2 border-cyan-500/60 flex items-center justify-center text-cyan-400 text-5xl shadow-lg">
+              <i class="fa-solid fa-eye"></i>
+            </div>
+            <div class="font-mono text-xs text-slate-300 space-y-1">
+              <p class="text-cyan-400 font-bold">TOKEN: RETINA-${Math.floor(100000 + Math.random()*900000)}</p>
+              <p class="text-slate-500">Eye Retina Signature Confirmed</p>
+            </div>
+          </div>
+        `;
+      } else {
+        titleEl.innerText = `Money Handover Photo: ${a.disburseMode}`;
+        if (a.disburseProofImg) {
+          canvasEl.innerHTML = `<img src="${a.disburseProofImg}" class="max-h-72 mx-auto rounded-xl border border-slate-700 shadow-lg" />`;
+        } else if (a.disburseMode === 'Hand') {
+          canvasEl.innerHTML = `
+            <div class="p-6 bg-slate-900 border-2 border-dashed border-emerald-500/50 rounded-2xl text-left space-y-3">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider"><i class="fa-solid fa-handshake mr-1"></i> Cash Handover Photo</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold">VERIFIED</span>
+              </div>
+              <div class="h-32 bg-slate-950 border border-slate-800 rounded-xl flex flex-col items-center justify-center text-slate-400 text-xs">
+                <i class="fa-solid fa-camera text-3xl text-emerald-400 mb-2"></i>
+                <p class="font-bold text-white">Cash Given Directly into Hand</p>
+                <p class="text-[10px] text-slate-500">Witness: Loan Manager V. Ganesh</p>
+              </div>
+              <p class="text-xs text-slate-300">Amount Given: <strong>₹${a.sanctionedAmount.toLocaleString('en-IN')} Cash</strong></p>
+            </div>
+          `;
+        } else if (a.disburseMode === 'Online') {
+          canvasEl.innerHTML = `
+            <div class="p-6 bg-slate-900 border-2 border-dashed border-cyan-500/50 rounded-2xl text-left space-y-3">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider"><i class="fa-solid fa-building-columns mr-1"></i> Bank Receipt</span>
+                <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-bold">PAID</span>
+              </div>
+              <div class="h-32 bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-[11px] text-slate-300 space-y-1">
+                <p class="text-emerald-400">Reference: ${a.disburseRef}</p>
+                <p>To: ${a.bankDetails}</p>
+                <p>Amount: ₹${a.sanctionedAmount.toLocaleString('en-IN')}.00</p>
+              </div>
+            </div>
+          `;
+        } else {
+          canvasEl.innerHTML = `
+            <div class="p-6 bg-slate-900 border-2 border-dashed border-amber-500/50 rounded-2xl text-left space-y-3">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-money-check mr-1"></i> Cheque Photo</span>
+                <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">ISSUED</span>
+              </div>
+              <div class="h-32 bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-[11px] text-slate-300 space-y-1">
+                <p>NAME: ${a.name}</p>
+                <p class="text-amber-400 font-bold">AMOUNT: ₹${a.sanctionedAmount.toLocaleString('en-IN')}/-</p>
+                <p>CHEQUE NUMBER: ${a.disburseRef}</p>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      openModal("dummyProofModal");
+    }
+
+    function handleDisburseModeChange() {
+      const mode = document.getElementById("regDisburseMode").value;
+      document.getElementById("proofHandBox").classList.add("hidden");
+      document.getElementById("proofOnlineBox").classList.add("hidden");
+      document.getElementById("proofChequeBox").classList.add("hidden");
+
+      if (mode === "Hand") {
+        document.getElementById("proofHandBox").classList.remove("hidden");
+      } else if (mode === "Online") {
+        document.getElementById("proofOnlineBox").classList.remove("hidden");
+      } else if (mode === "Cheque") {
+        document.getElementById("proofChequeBox").classList.remove("hidden");
+      }
+    }
+
+    function renderDynamicProfessionFields() {
+      const occ = document.getElementById("regOccupation").value;
+      const box = document.getElementById("dynamicProfessionContainer");
+
+      if (occ === "Smallholder Farmer") {
+        box.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+            <span class="font-bold text-emerald-400 uppercase text-[10px] flex items-center gap-1.5">
+              <i class="fa-solid fa-tractor"></i><span>Agricultural Land, Crops & Land Ownership</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Land Location / Survey No. *</label>
+              <input type="text" id="profLoc" required placeholder="e.g. Sy No. 58, Jigani Hobli" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Total Land Area *</label>
+              <input type="text" id="profArea" required placeholder="e.g. 2.5 Acres" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Crops Grown *</label>
+              <input type="text" id="profCrops" required placeholder="e.g. Paddy, Tomato, Chilli" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-slate-400 mb-1">Land Ownership *</label>
+              <select id="profTenancy" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none">
+                <option value="Self-Owned Patta Land">Own Land (Patta Registered)</option>
+                <option value="Leased / Rented Land">Rented / Leased Land (Tenant)</option>
+                <option value="Sharecropper / Batai">Shared Crop Agreement</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Secondary Extra Income (if any)</label>
+              <input type="text" id="profSecondary" placeholder="e.g. Dairy Milk, Poultry, Labor" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+        `;
+      } else if (occ === "Handloom & Silk Weaver") {
+        box.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+            <span class="font-bold text-cyan-400 uppercase text-[10px] flex items-center gap-1.5">
+              <i class="fa-solid fa-scroll"></i><span>Weaving Workshop & Looms</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Workshop Address *</label>
+              <input type="text" id="profLoc" required placeholder="e.g. Weavers Lane, Ward 2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Number of Looms *</label>
+              <input type="text" id="profArea" required placeholder="e.g. 2 Handlooms" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Items Woven *</label>
+              <input type="text" id="profCrops" required placeholder="e.g. Silk Sarees, Cotton Cloth" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-slate-400 mb-1">Workshop Ownership *</label>
+              <select id="profTenancy" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none">
+                <option value="Owned Home Workshop">Owned Home Workshop</option>
+                <option value="Rented Shed">Rented Shed</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Secondary Extra Income (if any)</label>
+              <input type="text" id="profSecondary" placeholder="e.g. Tailoring, Embroidery" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+        `;
+      } else if (occ === "Auto / E-Rickshaw Driver") {
+        box.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+            <span class="font-bold text-amber-400 uppercase text-[10px] flex items-center gap-1.5">
+              <i class="fa-solid fa-van-shuttle"></i><span>Vehicle & Route Details</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Vehicle Number *</label>
+              <input type="text" id="profLoc" required placeholder="e.g. KA-14-EA-4821" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none font-mono" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Daily Route *</label>
+              <input type="text" id="profArea" required placeholder="e.g. Bus Stand to Market" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Vehicle Fuel Type *</label>
+              <input type="text" id="profCrops" required placeholder="e.g. Electric / CNG" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-slate-400 mb-1">Vehicle Ownership *</label>
+              <select id="profTenancy" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none">
+                <option value="Self-Owned Vehicle">Own Vehicle</option>
+                <option value="Daily Fleet Rental / Khata">Rented Vehicle (Daily rent)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Secondary Extra Income (if any)</label>
+              <input type="text" id="profSecondary" placeholder="e.g. Night delivery, parcel hauling" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+        `;
+      } else if (occ === "Other") {
+        box.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+            <span class="font-bold text-amber-400 uppercase text-[10px] flex items-center gap-1.5">
+              <i class="fa-solid fa-pen-to-square"></i><span>Custom Trade / Occupation Details & Note Box</span>
+            </span>
+            <span class="text-[10px] text-slate-400">Add detailed field notes</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Specify Trade / Profession Name *</label>
+              <input type="text" id="profCrops" required placeholder="e.g. Carpenter, Blacksmith, Electrician" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Work Location / Workshop Address *</label>
+              <input type="text" id="profLoc" required placeholder="e.g. Industrial Shed, Client Locations" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-slate-400 mb-1">Work Premises Ownership *</label>
+              <select id="profTenancy" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none">
+                <option value="Self-Owned Space">Own Workspace / Home</option>
+                <option value="Rented Space">Rented Commercial Space</option>
+                <option value="Mobile / On-Site Service">Mobile / On-Site Client Service</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Estimated Monthly Business Volume *</label>
+              <input type="text" id="profArea" required placeholder="e.g. ₹25,000 monthly turnover" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Detailed Occupation & Secondary Income Notes *</label>
+            <textarea id="profSecondary" rows="2" required placeholder="Add complete notes regarding how the borrower earns, tool inventory, seasonal fluctuations, and secondary income sources..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none text-xs"></textarea>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+            <span class="font-bold text-emerald-400 uppercase text-[10px] flex items-center gap-1.5">
+              <i class="fa-solid fa-store"></i><span>Shop Location & Daily Business</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Shop Address / Stall *</label>
+              <input type="text" id="profLoc" required placeholder="e.g. Shop 4, Main Bazaar" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Daily Sales Volume *</label>
+              <input type="text" id="profArea" required placeholder="e.g. ₹3,500 daily sales" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Items Sold *</label>
+              <input type="text" id="profCrops" required placeholder="e.g. Groceries, Tea, Spices" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-slate-400 mb-1">Shop Ownership *</label>
+              <select id="profTenancy" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none">
+                <option value="Owned Shop">Own Shop</option>
+                <option value="Rented Shop Space">Rented Shop Space</option>
+                <option value="Street Vendor Stall">Street Stall</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Secondary Extra Income (if any)</label>
+              <input type="text" id="profSecondary" placeholder="e.g. Recharge, agent commission" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-white focus:outline-none" />
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function validateIndiaPhone(input) {
+      input.value = input.value.replace(/[^0-9]/g, '');
+      if (input.value.length > 10) {
+        input.value = input.value.slice(0, 10);
+      }
+      const alertEl = document.getElementById("phoneAlert");
+      if (input.value.length > 0 && input.value.length < 10) {
+        alertEl.classList.remove("hidden");
+      } else {
+        alertEl.classList.add("hidden");
+      }
+    }
+
+    function previewFile(input, targetId) {
+      const previewBox = document.getElementById(targetId);
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewBox.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover" />`;
+          previewBox.classList.remove("hidden");
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function captureBiometric(type) {
+      const status = document.getElementById("biometricStatus");
+      status.innerText = `Connecting to ${type} scanner hardware...`;
+      status.className = "text-[10px] text-emerald-400 mt-1 font-mono";
+      setTimeout(() => {
+        biometricToken = `BIO-${type.toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
+        status.innerText = `✓ ${type} verification captured & cryptographically signed (${biometricToken})`;
+        status.className = "text-[10px] text-emerald-400 mt-1 font-mono";
+      }, 1100);
+    }
+
+    function handleNewApplicant(e) {
+      e.preventDefault();
+      const name = document.getElementById("regName").value.trim();
+      const age = parseInt(document.getElementById("regAge").value);
+      const maritalStatus = document.getElementById("regMarital").value;
+      const rawOccupation = document.getElementById("regOccupation").value;
+      const phoneDigits = document.getElementById("regPhone").value.trim();
+      const tenureMonths = parseInt(document.getElementById("regTenureMonths").value) || 24;
+      
+      const addrLine = document.getElementById("regAddressLine").value.trim();
+      const resType = document.getElementById("regResidenceType").value;
+      const city = document.getElementById("regCity").value.trim();
+      const state = document.getElementById("regState").value.trim();
+      const pincode = document.getElementById("regPincode").value.trim();
+      const fullAddress = `${addrLine}, ${city}, ${state} - ${pincode} (${resType} House)`;
+
+      const profLoc = document.getElementById("profLoc") ? document.getElementById("profLoc").value.trim() : "Local Territory";
+      const profArea = document.getElementById("profArea") ? document.getElementById("profArea").value.trim() : "Standard Capacity";
+      const profCrops = document.getElementById("profCrops") ? document.getElementById("profCrops").value.trim() : "Certified Goods";
+      const profTenancy = document.getElementById("profTenancy") ? document.getElementById("profTenancy").value : "Self-Owned";
+      const profSecondary = document.getElementById("profSecondary") ? document.getElementById("profSecondary").value.trim() : "None";
+
+      const finalOccupation = rawOccupation === "Other" ? `Other: ${profCrops}` : rawOccupation;
+
+      const idType = document.getElementById("regProofType").value;
+      const idNumber = document.getElementById("regProofId").value.trim();
+
+      const disburseMode = document.getElementById("regDisburseMode").value;
+      const disburseRef = document.getElementById("regDisburseRef").value.trim() || "REF-" + Math.floor(100000 + Math.random() * 900000);
+
+      const bankName = document.getElementById("regBankName").value.trim();
+      const accNo = document.getElementById("regAccountNo").value.trim();
+      const ifsc = document.getElementById("regIfsc").value.trim();
+      const bankDetails = `${bankName} • A/C: ${accNo} • IFSC: ${ifsc}`;
+
+      const hhIncome = parseFloat(document.getElementById("regHhIncome").value);
+      const debtOutflows = parseFloat(document.getElementById("regDebtOutflow").value);
+      const loanAmt = parseFloat(document.getElementById("regLoanAmount").value);
+
+      if (phoneDigits.length !== 10) {
+        alert("Please enter exactly 10 digits for the mobile number.");
+        return;
+      }
+
+      const monthlyIncome = hhIncome / 12.0;
+      const proposedMonthlyEMI = (loanAmt * (1 + 0.12 * (tenureMonths / 12.0))) / tenureMonths;
+      if ((debtOutflows + proposedMonthlyEMI) > (0.50 * monthlyIncome)) {
+        alert(`Compliance Alert: Total monthly debt outflow (₹${Math.round(debtOutflows + proposedMonthlyEMI)}/mo) exceeds 50% of assessed household monthly income (₹${Math.round(monthlyIncome)}/mo). Loan amount must be reduced.`);
+        return;
+      }
+
+      const photoInput = document.getElementById("regApplicantPhoto");
+      let photoUrl = null;
+      if (photoInput.files && photoInput.files[0]) {
+        photoUrl = URL.createObjectURL(photoInput.files[0]);
+      }
+
+      const docPhotoInput = document.getElementById("regDocPhoto");
+      let ovdPhotoUrl = null;
+      if (docPhotoInput.files && docPhotoInput.files[0]) {
+        ovdPhotoUrl = URL.createObjectURL(docPhotoInput.files[0]);
+      }
+
+      let disburseProofImg = null;
+      let disburseProofText = "";
+      if (disburseMode === "Hand") {
+        const handFile = document.getElementById("regHandPhoto");
+        if (handFile.files && handFile.files[0]) disburseProofImg = URL.createObjectURL(handFile.files[0]);
+        disburseProofText = "In-Hand Physical Cash Handover Photo Archival Attached";
+      } else if (disburseMode === "Online") {
+        const onlineFile = document.getElementById("regOnlineBill");
+        if (onlineFile.files && onlineFile.files[0]) disburseProofImg = URL.createObjectURL(onlineFile.files[0]);
+        disburseProofText = "Official Online Banking Transfer Receipt / Bill Uploaded";
+      } else if (disburseMode === "Cheque") {
+        const chequeFile = document.getElementById("regChequeHandPhoto");
+        if (chequeFile.files && chequeFile.files[0]) disburseProofImg = URL.createObjectURL(chequeFile.files[0]);
+        disburseProofText = "Signed Cheque Leaf & Handover Ceremony Photo Archived";
+      }
+
+      const newId = `FG-0${applicants.length + 1}`;
+      const newLan = `LAN-KA-2026-0081${applicants.length + 1}`;
+      const newLsn = `LSN-2026-KA-094${applicants.length + 1}`;
+      
+      const totalInterest = loanAmt * (0.12 * (tenureMonths / 12.0));
+      const totalPayable = loanAmt + totalInterest;
+      const processingFee = Math.round(loanAmt * 0.015);
+
+      const now = new Date();
+      const dateString = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      const timeString = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const sanctionStamp = `${dateString} at ${timeString} IST`;
+
+      const maturityDateObj = new Date(now.setMonth(now.getMonth() + tenureMonths));
+      const maturityStamp = maturityDateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+      const calendarPool = [
+        "September 2026", "October 2026", "November 2026", "December 2026", 
+        "January 2027", "February 2027", "March 2027", "April 2027", 
+        "May 2027", "June 2027", "July 2027", "August 2027",
+        "September 2027", "October 2027", "November 2027", "December 2027",
+        "January 2028", "February 2028", "March 2028", "April 2028",
+        "May 2028", "June 2028", "July 2028", "August 2028",
+        "September 2028", "October 2028", "November 2028", "December 2028",
+        "January 2029", "February 2029", "March 2029", "April 2029",
+        "May 2029", "June 2029", "July 2029", "August 2029"
+      ];
+
+      const dynamicSched = [];
+      const baseShare = Math.round(totalPayable / tenureMonths);
+      for (let i = 0; i < tenureMonths; i++) {
+        dynamicSched.push({
+          month: calendarPool[i % calendarPool.length],
+          target: baseShare,
+          paid: 0,
+          status: "Scheduled"
+        });
+      }
+
+      applicants.unshift({
+        id: newId,
+        lan: newLan,
+        lsn: newLsn,
+        name,
+        age,
+        maritalStatus,
+        occupation: finalOccupation,
+        phone: `+91 ${phoneDigits}`,
+        address: fullAddress,
+        bankDetails: bankDetails,
+        idType,
+        idNumber,
+        biometricVerified: biometricToken ? true : false,
+        photoUrl: photoUrl,
+        ovdPhotoUrl: ovdPhotoUrl,
+        disburseMode,
+        disburseRef,
+        disburseProofText,
+        disburseProofImg,
+        sanctionDateTime: sanctionStamp,
+        maturityDate: maturityStamp,
+        duration: `${tenureMonths} Months`,
+        pslCategory: `Priority Credit: ${finalOccupation}`,
+        nomineeDetails: "Family Nominee Designated - KYC Validated",
+        bureauDetails: "CIBIL: 710 • Qualifying Household Asset",
+        endUseDetails: "Trade working capital investment",
+        tradeProfile: {
+          landLocation: profLoc,
+          cultivatedArea: profArea,
+          cropType: profCrops,
+          landTenancy: profTenancy,
+          secondaryIncome: profSecondary
+        },
+        hhIncome,
+        sanctionedAmount: loanAmt,
+        interestRateApr: 12.0,
+        tenure: tenureMonths,
+        processingFee: processingFee,
+        prepaymentPenalty: "0.00% (Free)",
+        cibilScore: 710,
+        totalPayable: Math.round(totalPayable),
+        paidTillNow: 0,
+        status: "Active",
+        monthTarget: baseShare,
+        collectedThisMonth: 0,
+        overduePast: 0,
+        repaymentType: "Dynamic Flexible",
+        schedule: dynamicSched
+      });
+
+      closeModal("newLoanModal");
+      document.getElementById("newApplicantForm").reset();
+      document.getElementById("photoPreview").classList.add("hidden");
+      document.getElementById("docPreview").classList.add("hidden");
+      biometricToken = null;
+      document.getElementById("biometricStatus").innerText = "Status: Awaiting biometric capture scan.";
+      document.getElementById("biometricStatus").className = "text-[10px] text-amber-400 mt-1 font-mono";
+
+      refreshAllViews();
+      alert(`Loan created for ${name}! Registered under LAN: ${newLan} for a duration of ${tenureMonths} Months.`);
+    }
+
+    // ================= DYNAMIC CALCULATOR =================
+    function runCalculator() {
+      const P = parseFloat(document.getElementById("calcPrincipal").value) || 60000;
+      const rAnnual = (parseFloat(document.getElementById("calcRate").value) || 12) / 100.0;
+      const T = parseInt(document.getElementById("calcTenure").value) || 24;
+      const pattern = document.getElementById("calcProfile").value;
+      const startIdx = parseInt(document.getElementById("calcStartMonth").value) || 0;
+      const applyShock = document.getElementById("calcApplyShock").checked;
+      const alpha = 0.40;
+
+      const calendarPool = [
+        "September 2026", "October 2026", "November 2026", "December 2026", 
+        "January 2027", "February 2027", "March 2027", "April 2027", 
+        "May 2027", "June 2027", "July 2027", "August 2027",
+        "September 2027", "October 2027", "November 2027", "December 2027",
+        "January 2028", "February 2028", "March 2028", "April 2028",
+        "May 2028", "June 2028", "July 2028", "August 2028",
+        "September 2028", "October 2028", "November 2028", "December 2028",
+        "January 2029", "February 2029", "March 2029", "April 2029",
+        "May 2029", "June 2029", "July 2029", "August 2029"
+      ];
+
+      const explanationEl = document.getElementById("archetypeExplanation");
+      let baseCashCycle = [];
+
+      if (pattern === "seasonal") {
+        explanationEl.innerText = "Seasonal Farmer (Ravi): Cash surplus dips to ₹3,500 during monsoon sowing and surges to ₹34,000 post-harvest. The flexible plan lowers repayment to ₹1,400 during the dip and collects when earnings are high.";
+        baseCashCycle = [28000, 32000, 3500, 2800, 8000, 11000, 14000, 16000, 19000, 34000, 31000, 18000];
+      } else if (pattern === "artisan") {
+        explanationEl.innerText = "Festival Artisan: Lower baseline earnings (~₹7,500) with a major surge during festival months (₹38,000+). The flexible plan aligns debt payments with peak sales.";
+        baseCashCycle = [8000, 7500, 8200, 9000, 8500, 10000, 12000, 15000, 38000, 42000, 12000, 8000];
+      } else {
+        explanationEl.innerText = "Daily Wage / Kirana: Daily earnings generate steady monthly income with low fluctuation (~₹14,000), allowing smooth and even installments.";
+        baseCashCycle = [14000, 13500, 15000, 12000, 14500, 13000, 14000, 15500, 13000, 14000, 13500, 14000];
+      }
+
+      let cashFlows = [];
+      for (let i = 0; i < T; i++) {
+        cashFlows.push(baseCashCycle[i % baseCashCycle.length]);
+      }
+
+      if (applyShock && T >= 4) {
+        cashFlows[3] = 1200.0;
+      }
+
+      const totalInterest = P * (rAnnual * (T / 12.0));
+      const totalRecoverable = P + totalInterest;
+      const flatRigidEmi = totalRecoverable / T;
+
+      const totalSurplusSum = cashFlows.reduce((a, b) => a + b, 0);
+      let dynamicRepayments = cashFlows.map(c => Math.max(300, Math.round((c / totalSurplusSum) * totalRecoverable)));
+
+      const currentSum = dynamicRepayments.reduce((a, b) => a + b, 0);
+      const diff = totalRecoverable - currentSum;
+      dynamicRepayments[T - 1] += Math.round(diff);
+
+      document.getElementById("calcStatPrincipal").innerText = `₹${P.toLocaleString('en-IN')}`;
+      document.getElementById("calcStatInterest").innerText = `₹${Math.round(totalInterest).toLocaleString('en-IN')}`;
+      document.getElementById("calcStatEmi").innerText = `₹${Math.round(flatRigidEmi).toLocaleString('en-IN')}/mo`;
+
+      document.getElementById("mathAuditTarget").innerText = `₹${Math.round(totalRecoverable).toLocaleString('en-IN')}`;
+      const actualDynamicSum = dynamicRepayments.reduce((a, b) => a + b, 0);
+      document.getElementById("mathAuditCollected").innerText = `₹${actualDynamicSum.toLocaleString('en-IN')}`;
+      document.getElementById("mathAuditVerdict").innerText = `RECOVERY STATUS: FULLY PAID (₹${actualDynamicSum.toLocaleString('en-IN')} / ₹${Math.round(totalRecoverable).toLocaleString('en-IN')})`;
+
+      const tbody = document.getElementById("calcTableBody");
+      tbody.innerHTML = "";
+      let defaultsPrevented = 0;
+
+      for (let t = 0; t < T; t++) {
+        const monthLabel = calendarPool[(startIdx + t) % calendarPool.length];
+        const cVal = cashFlows[t];
+        const dynVal = dynamicRepayments[t];
+        const emiVal = Math.round(flatRigidEmi);
+        const emiStressed = emiVal > (cVal * alpha);
+
+        if (emiStressed) defaultsPrevented++;
+
+        const tr = document.createElement("tr");
+        tr.className = emiStressed ? "bg-rose-950/20 hover:bg-rose-950/30" : "hover:bg-slate-800/60";
+        tr.innerHTML = `
+          <td class="p-3 font-medium text-slate-200">${monthLabel}</td>
+          <td class="p-3 text-slate-300 font-mono">₹${cVal.toLocaleString('en-IN')}</td>
+          <td class="p-3 font-semibold ${emiStressed ? 'text-rose-400 font-mono' : 'text-slate-300 font-mono'}">
+            ₹${emiVal.toLocaleString('en-IN')} ${emiStressed ? '<span class="text-[10px] text-rose-400 font-sans block">(Breaches 40% Limit)</span>' : ''}
+          </td>
+          <td class="p-3 font-bold text-emerald-400 font-mono">₹${dynVal.toLocaleString('en-IN')}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${emiStressed ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-400'}">
+              ${emiStressed ? 'Traditional Default' : '100% Affordable'}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById("calcStatDefaults").innerText = `${defaultsPrevented} Defaults Prevented`;
+      document.getElementById("calcStatDefaults").className = defaultsPrevented > 0 ? "text-sm font-bold text-emerald-400" : "text-sm font-bold text-slate-400";
+    }
+
+    function shareVisitingCard() {
+      const shareData = {
+        title: "V. Ganesh - FinanceGrow",
+        text: "V. Ganesh | Loan Manager\nFinanceGrow Micro Lending\n\"Your income shifts, your finance too\"\nPhone: +91 98450 12345\nEmail: ganesh@financegrow.in",
+        url: window.location.href
+      };
+      if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(shareData.text);
+        alert("Visiting card details copied to clipboard!");
+      }
+    }
+
+    window.onload = () => {
+      refreshAllViews();
+      renderDynamicProfessionFields();
+      runCalculator();
+    };
+  </script>
+</body>
+</html>
